@@ -1,0 +1,241 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .band-name { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .subtitle { font-size: 13px; color: var(--color-text-secondary); }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .status-bar { font-size: 12px; color: var(--color-text-secondary); display: flex; align-items: center; gap: 6px; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 1rem 1.25rem; }
+  .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+  .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .section { padding: 0 1.25rem 1rem; }
+  .section-header { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .request-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.75rem 1rem; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; }
+  .request-card.new { border-left: 3px solid #22c55e; }
+  .request-num { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); min-width: 22px; margin-top: 2px; }
+  .request-body { flex: 1; }
+  .song-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .song-artist { font-size: 13px; color: var(--color-text-secondary); margin-top: 1px; }
+  .request-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .requester { font-size: 12px; color: var(--color-text-secondary); }
+  .time-badge { font-size: 11px; color: var(--color-text-secondary); }
+  .actions { display: flex; gap: 6px; }
+  .btn-sm { font-size: 12px; padding: 3px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+  .btn-sm:hover { background: var(--color-background-secondary); }
+  .btn-play { color: var(--color-text-success); border-color: var(--color-border-success); }
+  .config-banner { background: var(--color-background-warning); border: 0.5px solid var(--color-border-warning); border-radius: var(--border-radius-lg); padding: 0.75rem 1rem; margin: 0 1.25rem 1rem; font-size: 13px; color: var(--color-text-warning); }
+  .config-banner strong { font-weight: 500; }
+  .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .input-row input { flex: 1; font-size: 13px; padding: 6px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+  .btn-connect { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; white-space: nowrap; }
+  .btn-connect:hover { background: var(--color-background-secondary); }
+  .setlist { padding: 0 1.25rem 1rem; }
+  .setlist-item { font-size: 13px; color: var(--color-text-secondary); padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 8px; }
+  .setlist-item:last-child { border-bottom: none; }
+  .setlist-num { font-size: 11px; color: var(--color-text-secondary); min-width: 18px; }
+  .tabs { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); padding: 0 1.25rem; margin-bottom: 1rem; }
+  .tab { font-size: 13px; padding: 8px 12px; cursor: pointer; color: var(--color-text-secondary); border-bottom: 2px solid transparent; margin-bottom: -0.5px; }
+  .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); }
+  .message-text { font-size: 12px; color: var(--color-text-secondary); font-style: italic; margin-top: 2px; }
+  .empty { text-align: center; padding: 2rem; color: var(--color-text-secondary); font-size: 14px; }
+  .qr-section { background: var(--color-background-secondary); margin: 0 1.25rem 1rem; border-radius: var(--border-radius-lg); padding: 1rem; display: flex; align-items: center; gap: 16px; }
+  .qr-placeholder { width: 72px; height: 72px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--color-background-primary); }
+  .qr-info { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+  .qr-info a { color: var(--color-text-info); }
+</style>
+
+<h2 class="sr-only">Live song request dashboard for your cover band</h2>
+
+<div class="header">
+  <div class="header-left">
+    <i class="ti ti-music" style="font-size:20px; color: var(--color-text-secondary);" aria-hidden="true"></i>
+    <div>
+      <div class="band-name" id="band-name-display">Your Band Name</div>
+      <div class="subtitle">Live Request Dashboard</div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="live-dot"></div>
+    <span id="status-text">Demo mode</span>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric"><div class="metric-label">Total requests</div><div class="metric-value" id="total-count">3</div></div>
+  <div class="metric"><div class="metric-label">New (last 10 min)</div><div class="metric-value" id="new-count">1</div></div>
+  <div class="metric"><div class="metric-label">Played</div><div class="metric-value" id="played-count">0</div></div>
+</div>
+
+<div class="config-banner" id="config-banner">
+  <strong>Setup required:</strong> Enter your Google Sheet CSV URL and Form URL below to go live.
+  <div style="margin-top:8px;">
+    <div class="input-row">
+      <input type="text" id="csv-url-input" placeholder="Google Sheet CSV URL (File → Share → Publish to web → CSV)" />
+    </div>
+    <div class="input-row">
+      <input type="text" id="form-url-input" placeholder="Google Form share URL (for QR code)" />
+      <button class="btn-connect" onclick="connectSheet()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('requests',this)">Requests</div>
+  <div class="tab" onclick="showTab('setlist',this)">Setlist</div>
+  <div class="tab" onclick="showTab('qr',this)">QR / Share</div>
+</div>
+
+<div id="tab-requests">
+  <div class="section">
+    <div class="section-header"><span>Incoming requests</span><span id="refresh-label" style="cursor:pointer; font-size:12px;" onclick="fetchRequests()"><i class="ti ti-refresh" style="font-size:13px;" aria-hidden="true"></i> Refresh</span></div>
+    <div id="request-list"></div>
+  </div>
+</div>
+
+<div id="tab-setlist" style="display:none;">
+  <div class="setlist">
+    <div class="section-header" style="margin-bottom:12px;">Tonight's setlist <span style="font-size:11px; cursor:pointer; color:var(--color-text-info);" onclick="editSetlist()">+ Edit</span></div>
+    <div id="setlist-list"></div>
+  </div>
+</div>
+
+<div id="tab-qr" style="display:none;">
+  <div style="padding: 0 1.25rem 1rem;">
+    <div class="qr-section">
+      <div class="qr-placeholder">
+        <i class="ti ti-qrcode" style="font-size:36px; color: var(--color-text-secondary);" aria-hidden="true"></i>
+      </div>
+      <div class="qr-info">
+        Connect your Google Form URL above, then generate a QR code at <a href="https://qr.io" target="_blank">qr.io</a> or <a href="https://www.qr-code-generator.com" target="_blank">qr-code-generator.com</a> pointing to your form. Print and place on tables!
+      </div>
+    </div>
+    <div style="font-size:13px; color:var(--color-text-secondary); line-height:1.7; padding: 0 0 1rem;">
+      <p><strong style="font-weight:500; color:var(--color-text-primary);">Tip:</strong> Set up your form to show your setlist as a dropdown so audience members can only request songs you actually play. You can also add a free-text "other song" field.</p>
+      <br>
+      <p>Once your form URL is entered above, copy it and paste into any free QR code generator. Download as PNG and print at high resolution.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEMO_REQUESTS = [
+  { song: "Don't Stop Believin'", artist: "Journey", name: "Sarah", time: "8:32 PM", message: "This is our song!", isNew: true },
+  { song: "Sweet Home Alabama", artist: "Lynyrd Skynyrd", name: "Mike & Jen", time: "8:18 PM", message: "", isNew: false },
+  { song: "Mr. Brightside", artist: "The Killers", name: "Anonymous", time: "8:05 PM", message: "", isNew: false },
+];
+
+let requests = [...DEMO_REQUESTS];
+let played = new Set();
+let setlist = [
+  { song: "Don't Stop Believin'", artist: "Journey" },
+  { song: "Sweet Home Alabama", artist: "Lynyrd Skynyrd" },
+  { song: "Mr. Brightside", artist: "The Killers" },
+  { song: "Livin' on a Prayer", artist: "Bon Jovi" },
+  { song: "Africa", artist: "Toto" },
+  { song: "Bohemian Rhapsody", artist: "Queen" },
+];
+let csvUrl = "";
+let pollInterval = null;
+
+function renderRequests() {
+  const list = document.getElementById("request-list");
+  const active = requests.filter((r, i) => !played.has(i));
+  if (!active.length) {
+    list.innerHTML = '<div class="empty"><i class="ti ti-music-off" aria-hidden="true" style="font-size:24px;display:block;margin-bottom:8px;"></i>No requests yet — share the QR code!</div>';
+    return;
+  }
+  list.innerHTML = active.map((r) => {
+    const idx = requests.indexOf(r);
+    return `<div class="request-card${r.isNew ? ' new' : ''}">
+      <div class="request-num">#${active.indexOf(r)+1}</div>
+      <div class="request-body">
+        <div class="song-title">${r.song}</div>
+        <div class="song-artist">${r.artist}</div>
+        ${r.message ? `<div class="message-text">"${r.message}"</div>` : ''}
+        <div class="request-meta">
+          <span class="requester"><i class="ti ti-user" style="font-size:12px;" aria-hidden="true"></i> ${r.name}</span>
+          <span class="time-badge">${r.time}</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-sm btn-play" onclick="markPlayed(${idx})" title="Mark as played"><i class="ti ti-check" aria-hidden="true"></i></button>
+        <button class="btn-sm" onclick="removeRequest(${idx})" title="Remove"><i class="ti ti-x" aria-hidden="true"></i></button>
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("total-count").textContent = requests.length;
+  document.getElementById("new-count").textContent = requests.filter(r => r.isNew).length;
+  document.getElementById("played-count").textContent = played.size;
+}
+
+function markPlayed(idx) {
+  played.add(idx);
+  renderRequests();
+}
+
+function removeRequest(idx) {
+  requests.splice(idx, 1);
+  renderRequests();
+}
+
+function renderSetlist() {
+  const list = document.getElementById("setlist-list");
+  list.innerHTML = setlist.map((s, i) =>
+    `<div class="setlist-item"><span class="setlist-num">${i+1}</span><span style="color:var(--color-text-primary);font-size:14px;">${s.song}</span><span style="margin-left:auto;font-size:12px;">${s.artist}</span></div>`
+  ).join("");
+}
+
+function editSetlist() {
+  sendPrompt("Help me edit my setlist for the song request dashboard. I want to update the songs.");
+}
+
+function showTab(name, el) {
+  document.getElementById("tab-requests").style.display = name === "requests" ? "block" : "none";
+  document.getElementById("tab-setlist").style.display = name === "setlist" ? "block" : "none";
+  document.getElementById("tab-qr").style.display = name === "qr" ? "block" : "none";
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+}
+
+function connectSheet() {
+  csvUrl = document.getElementById("csv-url-input").value.trim();
+  const formUrl = document.getElementById("form-url-input").value.trim();
+  if (!csvUrl) { alert("Please paste your Google Sheet CSV URL."); return; }
+  document.getElementById("config-banner").style.display = "none";
+  document.getElementById("status-text").textContent = "Live — refreshing every 15s";
+  requests = [];
+  fetchRequests();
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(fetchRequests, 15000);
+}
+
+async function fetchRequests() {
+  if (!csvUrl) return;
+  try {
+    const r = await fetch(csvUrl + "&t=" + Date.now());
+    const text = await r.text();
+    const rows = text.trim().split("\n").slice(1);
+    const prevCount = requests.length;
+    const newReqs = rows.map(row => {
+      const cols = row.split(",").map(c => c.replace(/^"|"$/g, "").trim());
+      return { song: cols[1]||"?", artist: cols[2]||"?", name: cols[3]||"Anonymous", time: cols[0]||"", message: cols[4]||"", isNew: false };
+    }).reverse();
+    if (newReqs.length > prevCount) {
+      for (let i = 0; i < newReqs.length - prevCount; i++) newReqs[i].isNew = true;
+    }
+    requests = newReqs;
+    renderRequests();
+    document.getElementById("refresh-label").innerHTML = '<i class="ti ti-refresh" style="font-size:13px;" aria-hidden="true"></i> ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  } catch(e) {
+    document.getElementById("status-text").textContent = "Error fetching — check URL";
+  }
+}
+
+renderRequests();
+renderSetlist();
+</script>
