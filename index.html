@@ -1,0 +1,258 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .wrap { font-family: var(--font-sans); background: #000; color: #fff; border-radius: var(--border-radius-lg); overflow: hidden; }
+  .header { background: #000; padding: 1.25rem 1.5rem; border-bottom: 2px solid #fff; display: flex; align-items: center; justify-content: space-between; }
+  .band-title { font-size: 26px; font-weight: 500; letter-spacing: 0.08em; color: #fff; text-transform: uppercase; }
+  .band-sub { font-size: 12px; color: #aaa; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
+  .live-pill { display: flex; align-items: center; gap: 6px; background: #fff; color: #000; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.06em; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .metrics { display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 1px solid #333; }
+  .metric { padding: 1rem 1.25rem; border-right: 1px solid #333; }
+  .metric:last-child { border-right: none; }
+  .metric-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .metric-value { font-size: 28px; font-weight: 500; color: #fff; }
+  .config-banner { background: #1a1a1a; border-bottom: 1px solid #444; padding: 1rem 1.5rem; font-size: 14px; color: #ccc; }
+  .config-banner strong { color: #fff; font-weight: 500; }
+  .input-row { display: flex; gap: 8px; margin-top: 8px; }
+  .input-row input { flex: 1; font-size: 13px; padding: 8px 12px; border-radius: var(--border-radius-md); border: 1px solid #444; background: #111; color: #fff; }
+  .input-row input::placeholder { color: #666; }
+  .btn-connect { font-size: 13px; padding: 8px 16px; border-radius: var(--border-radius-md); border: 1px solid #fff; background: #fff; color: #000; cursor: pointer; font-weight: 500; white-space: nowrap; }
+  .btn-connect:hover { background: #ddd; }
+  .tabs { display: flex; border-bottom: 1px solid #333; }
+  .tab { font-size: 14px; padding: 10px 16px; cursor: pointer; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; letter-spacing: 0.04em; }
+  .tab.active { color: #fff; border-bottom-color: #fff; }
+  .section { padding: 1rem 1.5rem; }
+  .section-header { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .refresh-btn { cursor: pointer; color: #888; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .refresh-btn:hover { color: #fff; }
+  .request-card { background: #111; border: 1px solid #333; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 12px; }
+  .request-card.new { border-left: 4px solid #22c55e; }
+  .request-num { font-size: 13px; color: #666; min-width: 24px; margin-top: 3px; }
+  .request-body { flex: 1; }
+  .song-title { font-size: 20px; font-weight: 500; color: #fff; }
+  .song-artist { font-size: 16px; color: #aaa; margin-top: 2px; }
+  .message-text { font-size: 14px; color: #888; font-style: italic; margin-top: 6px; }
+  .request-meta { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .requester { font-size: 13px; color: #888; display: flex; align-items: center; gap: 4px; }
+  .time-badge { font-size: 12px; color: #666; }
+  .actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-sm { font-size: 13px; padding: 5px 12px; border-radius: var(--border-radius-md); border: 1px solid #444; background: transparent; color: #aaa; cursor: pointer; }
+  .btn-sm:hover { border-color: #fff; color: #fff; }
+  .btn-played { border-color: #22c55e; color: #22c55e; }
+  .btn-played:hover { background: #22c55e22; }
+  .empty { text-align: center; padding: 3rem 1rem; color: #666; font-size: 16px; }
+  .setlist-item { font-size: 16px; color: #ccc; padding: 10px 0; border-bottom: 1px solid #222; display: flex; align-items: center; gap: 10px; }
+  .setlist-item:last-child { border-bottom: none; }
+  .setlist-num { font-size: 12px; color: #555; min-width: 22px; }
+  .setlist-artist { margin-left: auto; font-size: 13px; color: #666; }
+  .qr-box { background: #111; border: 1px solid #333; border-radius: var(--border-radius-lg); padding: 1.25rem; display: flex; align-items: center; gap: 16px; margin-bottom: 1rem; }
+  .qr-icon { width: 72px; height: 72px; border: 1px solid #444; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #000; }
+  .qr-info { font-size: 14px; color: #aaa; line-height: 1.6; }
+  .qr-info a { color: #fff; }
+  .form-link { font-size: 13px; color: #888; word-break: break-all; margin-top: 8px; background: #1a1a1a; border-radius: var(--border-radius-md); padding: 8px 12px; border: 1px solid #333; }
+  .saved-badge { display: inline-block; background: #1a1a1a; border: 1px solid #333; border-radius: 999px; font-size: 11px; color: #888; padding: 2px 10px; margin-left: 8px; vertical-align: middle; }
+</style>
+
+<h2 class="sr-only">The Spinoffs live song request dashboard</h2>
+
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <div class="band-title">The Spinoffs</div>
+      <div class="band-sub">Live Song Request Dashboard</div>
+    </div>
+    <div class="live-pill">
+      <div class="live-dot"></div>
+      <span id="status-text">Demo</span>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Requests</div><div class="metric-value" id="total-count">3</div></div>
+    <div class="metric"><div class="metric-label">New</div><div class="metric-value" id="new-count">1</div></div>
+    <div class="metric"><div class="metric-label">Played</div><div class="metric-value" id="played-count">0</div></div>
+  </div>
+
+  <div class="config-banner" id="config-banner">
+    <strong>Connect your Google Sheet</strong> <span class="saved-badge" id="saved-label" style="display:none;">✓ saved</span>
+    <div class="input-row">
+      <input type="text" id="csv-url-input" placeholder="Google Sheet CSV URL" />
+    </div>
+    <div class="input-row" style="margin-top:6px;">
+      <input type="text" id="form-url-input" placeholder="Google Form URL (for QR tab)" />
+      <button class="btn-connect" onclick="connectSheet()">Connect</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('requests',this)">Requests</div>
+    <div class="tab" onclick="showTab('setlist',this)">Setlist</div>
+    <div class="tab" onclick="showTab('qr',this)">QR / Share</div>
+  </div>
+
+  <div id="tab-requests">
+    <div class="section">
+      <div class="section-header">
+        <span>Incoming requests</span>
+        <span class="refresh-btn" onclick="fetchRequests()"><i class="ti ti-refresh" style="font-size:13px;" aria-hidden="true"></i> <span id="refresh-label">Refresh</span></span>
+      </div>
+      <div id="request-list"></div>
+    </div>
+  </div>
+
+  <div id="tab-setlist" style="display:none;">
+    <div class="section">
+      <div class="section-header"><span>Tonight's setlist</span></div>
+      <div id="setlist-list"></div>
+    </div>
+  </div>
+
+  <div id="tab-qr" style="display:none;">
+    <div class="section">
+      <div class="qr-box">
+        <div class="qr-icon"><i class="ti ti-qrcode" style="font-size:38px; color:#fff;" aria-hidden="true"></i></div>
+        <div class="qr-info">
+          Generate your QR code at <a href="https://qr.io" target="_blank">qr.io</a> or <a href="https://www.qr-code-generator.com" target="_blank">qr-code-generator.com</a> using your form URL below. Print and place on tables!
+          <div class="form-link" id="form-url-display">Enter your form URL in the Connect panel above.</div>
+        </div>
+      </div>
+      <p style="font-size:14px; color:#888; line-height:1.7;">Your Google Form is titled <strong style="color:#fff;">"LIVE Song Requests!"</strong> — audience members can fill it out after scanning the QR code. Their submissions go straight to your Google Sheet and appear here within 15 seconds.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY_CSV = 'spinoffs_csv_url';
+const STORAGE_KEY_FORM = 'spinoffs_form_url';
+
+const DEMO_REQUESTS = [
+  { song: "Don't Stop Believin'", artist: "Journey", name: "Sarah", time: "8:32 PM", message: "This is our song!", isNew: true },
+  { song: "Sweet Home Alabama", artist: "Lynyrd Skynyrd", name: "Mike & Jen", time: "8:18 PM", message: "", isNew: false },
+  { song: "Mr. Brightside", artist: "The Killers", name: "Anonymous", time: "8:05 PM", message: "", isNew: false },
+];
+
+let requests = [...DEMO_REQUESTS];
+let played = new Set();
+let csvUrl = "";
+let pollInterval = null;
+
+const setlist = [
+  { song: "Don't Stop Believin'", artist: "Journey" },
+  { song: "Sweet Home Alabama", artist: "Lynyrd Skynyrd" },
+  { song: "Mr. Brightside", artist: "The Killers" },
+  { song: "Livin' on a Prayer", artist: "Bon Jovi" },
+  { song: "Africa", artist: "Toto" },
+  { song: "Bohemian Rhapsody", artist: "Queen" },
+];
+
+function loadSaved() {
+  try {
+    const savedCsv = localStorage.getItem(STORAGE_KEY_CSV);
+    const savedForm = localStorage.getItem(STORAGE_KEY_FORM);
+    if (savedCsv) {
+      document.getElementById("csv-url-input").value = savedCsv;
+    }
+    if (savedForm) {
+      document.getElementById("form-url-input").value = savedForm;
+      document.getElementById("form-url-display").textContent = savedForm;
+    }
+    if (savedCsv) {
+      connectSheet(true);
+    }
+  } catch(e) {}
+}
+
+function connectSheet(silent) {
+  csvUrl = document.getElementById("csv-url-input").value.trim();
+  const formUrl = document.getElementById("form-url-input").value.trim();
+  if (!csvUrl) { if (!silent) alert("Please paste your Google Sheet CSV URL."); return; }
+  try {
+    localStorage.setItem(STORAGE_KEY_CSV, csvUrl);
+    if (formUrl) localStorage.setItem(STORAGE_KEY_FORM, formUrl);
+  } catch(e) {}
+  document.getElementById("config-banner").style.display = "none";
+  document.getElementById("saved-label").style.display = "inline-block";
+  document.getElementById("status-text").textContent = "Live";
+  if (formUrl) document.getElementById("form-url-display").textContent = formUrl;
+  requests = [];
+  fetchRequests();
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(fetchRequests, 15000);
+}
+
+async function fetchRequests() {
+  if (!csvUrl) return;
+  try {
+    const r = await fetch(csvUrl + "&t=" + Date.now());
+    const text = await r.text();
+    const rows = text.trim().split("\n").slice(1).filter(r => r.trim());
+    const prevCount = requests.length;
+    const newReqs = rows.map(row => {
+      const cols = row.split(",").map(c => c.replace(/^"|"$/g,"").trim());
+      return { song: cols[1]||"?", artist: cols[2]||"?", name: cols[3]||"Anonymous", time: cols[0]||"", message: cols[4]||"", isNew: false };
+    }).reverse();
+    if (newReqs.length > prevCount) {
+      for (let i = 0; i < newReqs.length - prevCount; i++) newReqs[i].isNew = true;
+    }
+    requests = newReqs;
+    renderRequests();
+    document.getElementById("refresh-label").textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    document.getElementById("status-text").textContent = "Error";
+  }
+}
+
+function renderRequests() {
+  const list = document.getElementById("request-list");
+  const active = requests.filter((_, i) => !played.has(i));
+  document.getElementById("total-count").textContent = requests.length;
+  document.getElementById("new-count").textContent = requests.filter(r => r.isNew).length;
+  document.getElementById("played-count").textContent = played.size;
+  if (!active.length) {
+    list.innerHTML = '<div class="empty"><i class="ti ti-music-off" aria-hidden="true" style="font-size:28px;display:block;margin-bottom:10px;color:#555;"></i>No requests yet — share the QR code!</div>';
+    return;
+  }
+  list.innerHTML = active.map((r, displayIdx) => {
+    const origIdx = requests.indexOf(r);
+    return `<div class="request-card${r.isNew ? ' new' : ''}">
+      <div class="request-num">#${displayIdx+1}</div>
+      <div class="request-body">
+        <div class="song-title">${r.song}</div>
+        <div class="song-artist">${r.artist}</div>
+        ${r.message ? `<div class="message-text">"${r.message}"</div>` : ''}
+        <div class="request-meta">
+          <span class="requester"><i class="ti ti-user" style="font-size:13px;" aria-hidden="true"></i> ${r.name}</span>
+          <span class="time-badge">${r.time}</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-sm btn-played" onclick="markPlayed(${origIdx})" title="Mark as played"><i class="ti ti-check" aria-hidden="true"></i> Played</button>
+        <button class="btn-sm" onclick="removeReq(${origIdx})" title="Dismiss"><i class="ti ti-x" aria-hidden="true"></i></button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function markPlayed(idx) { played.add(idx); renderRequests(); }
+function removeReq(idx) { requests.splice(idx,1); renderRequests(); }
+
+function renderSetlist() {
+  document.getElementById("setlist-list").innerHTML = setlist.map((s,i) =>
+    `<div class="setlist-item"><span class="setlist-num">${i+1}</span><span>${s.song}</span><span class="setlist-artist">${s.artist}</span></div>`
+  ).join("");
+}
+
+function showTab(name, el) {
+  ["requests","setlist","qr"].forEach(t => document.getElementById("tab-"+t).style.display = t===name?"block":"none");
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+}
+
+renderRequests();
+renderSetlist();
+loadSaved();
+</script>
